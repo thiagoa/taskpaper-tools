@@ -2,12 +2,14 @@ module Taskpaper
 
   def self.factory(path)
     contents = File.read path
-    DataFile.new contents, RawLineParser.new
+    DataFile.new contents, LineParser.new
   end
 
-  class RawLineParser
-    TASK    = /\A\t*-\s+([^\s]+)\Z/
-    PROJECT = /\A\t*[^-\s](.+):( ((@[^\s]+\s+)+)?@[^\s]+)?\Z/
+  class LineParser
+    PROJECT        = /\A\t*[^-\s](.+):( ((@[^\s]+\s+)+)?@[^\s]+)?\Z/
+    TASK           = /\A\t*-\s(.*)\Z/
+    TAG_WITH_VALUE = /(@([^\s]+)\((.+?)\))/
+    TAG            = /(@([^\s]+))/
 
     def initialize(&callback)
       @callback = callback if block_given?
@@ -25,36 +27,68 @@ module Taskpaper
       !is_comment?(line) && !is_task?(line)
     end
 
-    def execute(line)
+    def title(line, type)
+      line[type, 1]
     end
-  end
 
-  class DataFile
-    attr_accessor :raw_content
+    def detect_indent line
+      line[/\t*/].length
+    end
 
-    def initialize(contents, parser)
-      @raw_content = contents
-      @lines = []
+    def parse_tags(line)
+      tags = []
+      if line =~ TAG_WITH_VALUE
+        args = line.scan(TAG_WITH_VALUE) do |args|
+          tags << Tag.new(*args)
+        end
+      elsif line =~ TAG
+        args = line.scan(TAG) do |args|
+          tags << Tag.new(*args)
+        end
+      end
+      tags
+    end
 
-      contents.each_line do |line|
-        @lines << parser.execute(line)
+    def parse(line)
+      tags = parse_tags(line)
+      if is_project? line
+        Project.new line, title(line, PROJECT), tags
+      elsif is_task? line
+        Task.new line, title(line, TASK), tags
+      else
+        Comment.new line, line.strip, tags
       end
     end
   end
 
-  Line = Struct.new(:text, :title, :tags, :father, :children) do
-    attr_accessor :text, :title, :tags, :father, :children
+  class DataFile
+    include Enumerable
+    attr_reader :lines
+
+    def initialize(contents, parser)
+      @lines = []
+
+      contents.each_line do |line|
+        @lines << parser.parse(line)
+      end
+    end
+
+    def projects
+      2
+    end
+
+    def each(&block)
+      lines.each { |line| block.call line }
+    end
   end
 
-  class Project < Line
+  Line = Struct.new(:text, :title, :tags, :children) do
+    attr_accessor :text, :title, :tags, :children
   end
 
-  class Task < Line
-  end
+  class Project < Line; end
+  class Task    < Line; end
+  class Comment < Line; end
 
-  class Comment < Line
-  end
-
-  class Tag
-  end
+  Tag = Struct.new(:tag, :title, :value)
 end

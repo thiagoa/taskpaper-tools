@@ -8,8 +8,8 @@ describe Taskpaper do
     end
   end
 
-  describe Taskpaper::RawLineParser do
-    let(:parser) { Taskpaper::RawLineParser.new }
+  describe Taskpaper::LineParser do
+    let(:parser) { Taskpaper::LineParser.new }
 
     describe "#is_project?" do
       context "with valid project lines" do
@@ -41,10 +41,50 @@ describe Taskpaper do
             "\tPaintings: @daily ",
             "\tPaper Drawings: @one two @three",
             "\tAnother: @one @two @three ",
-            "Comment line"
+            "Comment line",
+            "New line project:\n\n"
           ]
           lines.each do |line|
             parser.is_project?(line).should be_nil
+          end
+        end
+      end
+    end
+    describe "#is_task" do
+      context "with valid task lines" do
+        it "asserts valid tasks" do
+          lines = [
+            "- Home tasks",
+            "\t- Cleaning:",
+            "\t\t- Other",
+            "- Room organization @weekly",
+            "\t\t\t- Drawings @daily everyday",
+            "\t- Paintings: @daily @art",
+            "\t- @many Paper Drawings @everyday",
+            "- Weird task: @tag1  @tag2 @tag3"
+          ]
+          lines.each do |line|
+            parser.is_task?(line).should_not be_nil, "#{line} should be a task"
+          end
+        end
+      end
+
+      context "with invalid task lines" do
+        it "doesn't assert invalid tasks" do
+          lines = [
+            "Home tasks: ",
+            "\t Cleaning:",
+            "\t\tOther: ",
+            "Room organization: @weekly mess",
+            "-Drawings:",
+            "\tPaintings: @daily ",
+            "\tPaper Drawings: @one two @three",
+            "\tAnother: @one @two @three ",
+            "Comment line",
+            "New line task:\n\n"
+          ]
+          lines.each do |line|
+            parser.is_task?(line).should be_nil
           end
         end
       end
@@ -55,8 +95,7 @@ describe Taskpaper do
     context "when an object is created" do
       subject { Taskpaper.factory('example.taskpaper') }
 
-      its(:raw_content) { should be_a String }
-      #its(:projects) { should == 2 }
+      its(:projects) { should == 2 }
     end
   end
 end
