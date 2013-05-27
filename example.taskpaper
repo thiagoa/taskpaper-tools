@@ -1,7 +1,8 @@
 Home todos:
+	- @first thing today: read @email
 	- Buy bread and milk
 	- Clean the bathroom @nasty
-	- Find a new receipt to cook for the dinner
+	- Find a new receipt to cook for the dinner @cooking(receipts)
 	- Feed the cat at night @greedy @kitties
 
 Work:
