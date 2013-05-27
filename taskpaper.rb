@@ -38,11 +38,11 @@ module Taskpaper
     def parse_tags(line)
       tags = []
       if line =~ TAG_WITH_VALUE
-        args = line.scan(TAG_WITH_VALUE) do |args|
+        line.scan(TAG_WITH_VALUE) do |args|
           tags << Tag.new(*args)
         end
       elsif line =~ TAG
-        args = line.scan(TAG) do |args|
+        line.scan(TAG) do |args|
           tags << Tag.new(*args)
         end
       end
