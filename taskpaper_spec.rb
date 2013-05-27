@@ -50,6 +50,7 @@ describe Taskpaper do
         end
       end
     end
+
     describe "#is_task" do
       context "with valid task lines" do
         it "asserts valid tasks" do
@@ -88,6 +89,12 @@ describe Taskpaper do
           end
         end
       end
+    end
+
+    describe "#parse_tags" do
+      subject { parser.parse_tags "One @line with @tag(values) @and(other values)" }
+
+      its(:length) { should == 3 }
     end
   end
 

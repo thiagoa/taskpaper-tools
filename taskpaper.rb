@@ -6,10 +6,9 @@ module Taskpaper
   end
 
   class LineParser
-    PROJECT        = /\A\t*[^-\s](.+):( ((@[^\s]+\s+)+)?@[^\s]+)?\Z/
-    TASK           = /\A\t*-\s(.*)\Z/
-    TAG_WITH_VALUE = /(@([^\s]+)\((.+?)\))/
-    TAG            = /(@([^\s]+))/
+    PROJECT = /\A\t*[^-\s](.+):( ((@[^\s]+\s+)+)?@[^\s]+)?\Z/
+    TASK    = /\A\t*-\s(.*)\Z/
+    TAG     = /(@(\S+)\((.*?)\)|@(\S+))/
 
     def initialize(&callback)
       @callback = callback if block_given?
@@ -36,17 +35,7 @@ module Taskpaper
     end
 
     def parse_tags(line)
-      tags = []
-      if line =~ TAG_WITH_VALUE
-        line.scan(TAG_WITH_VALUE) do |args|
-          tags << Tag.new(*args)
-        end
-      elsif line =~ TAG
-        line.scan(TAG) do |args|
-          tags << Tag.new(*args)
-        end
-      end
-      tags
+      line.scan(TAG).map { |args| Tag.new(*args.compact) }
     end
 
     def parse(line)
