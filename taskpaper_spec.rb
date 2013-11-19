@@ -25,7 +25,8 @@ describe Taskpaper do
             "Weird Project: @tag1  @tag2 @tag3"
           ]
           lines.each do |line|
-            parser.is_project?(line).should_not be_nil
+            parser.line = line
+            parser.is_project?.should_not be_nil
           end
         end
       end
@@ -45,7 +46,8 @@ describe Taskpaper do
             "New line project:\n\n"
           ]
           lines.each do |line|
-            parser.is_project?(line).should be_nil
+            parser.line = line
+            parser.is_project?.should be_nil
           end
         end
       end
@@ -65,7 +67,8 @@ describe Taskpaper do
             "- Weird task: @tag1  @tag2 @tag3"
           ]
           lines.each do |line|
-            parser.is_task?(line).should_not be_nil, "#{line} should be a task"
+            parser.line = line
+            parser.is_task?.should_not be_nil, "#{line} should be a task"
           end
         end
       end
@@ -85,7 +88,8 @@ describe Taskpaper do
             "New line task:\n\n"
           ]
           lines.each do |line|
-            parser.is_task?(line).should be_nil
+            parser.line = line
+            parser.is_task?.should be_nil
           end
         end
       end

@@ -10,27 +10,25 @@ module Taskpaper
     TASK    = /\A\t*-\s(.*)\Z/
     TAG     = /(@(\S+)\((.*?)\)|@(\S+))/
 
-    def initialize(&callback)
-      @callback = callback if block_given?
-    end
+    attr_accessor :line
 
-    def is_project? line
+    def is_project?
       line =~ PROJECT
     end
 
-    def is_task? line
+    def is_task?
       line =~ TASK
     end
 
-    def is_comment? line
-      !is_comment?(line) && !is_task?(line)
+    def is_comment?
+      !is_project? && !is_task?
     end
 
-    def title(line, type)
+    def extract_title(type)
       line[type, 1]
     end
 
-    def detect_indent line
+    def detect_indent
       line[/\t*/].length
     end
 
@@ -38,12 +36,12 @@ module Taskpaper
       line.scan(TAG).map { |args| Tag.new(*args.compact) }
     end
 
-    def parse(line)
+    def parse
       tags = parse_tags(line)
-      if is_project? line
-        Project.new line, title(line, PROJECT), tags
-      elsif is_task? line
-        Task.new line, title(line, TASK), tags
+      if is_project?
+        Project.new line, extract_title(PROJECT), tags
+      elsif is_task?
+        Task.new line, extract_title(TASK), tags
       else
         Comment.new line, line.strip, tags
       end
