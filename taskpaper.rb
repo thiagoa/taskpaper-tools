@@ -53,29 +53,50 @@ module Taskpaper
     attr_reader :lines
 
     def initialize(contents, parser)
-      @lines = []
-
-      contents.each_line do |line|
-        @lines << parser.parse(line)
+      @lines = contents.split(/\n/).map do |line| 
+        parser.line = line
+        parser.parse
       end
     end
 
     def projects
-      2
+      count 'project'
+    end
+
+    def tasks
+      count 'task'
+    end
+
+    def comments
+      count 'comment'
     end
 
     def each(&block)
       lines.each { |line| block.call line }
     end
+
+    private
+      def count(type)
+        lines.inject(0) do |total, line| 
+          total = total + 1 if line.type == type
+          total
+        end
+      end
   end
 
   Line = Struct.new(:text, :title, :tags, :children) do
-    attr_accessor :text, :title, :tags, :children
+    attr_reader :text, :title, :tags, :children
+
+    def type
+      self.class.to_s.split('::').pop.downcase
+    end
   end
 
   class Project < Line; end
   class Task    < Line; end
   class Comment < Line; end
 
-  Tag = Struct.new(:tag, :title, :value)
+  Tag = Struct.new(:tag, :title, :value) do
+    attr_reader :tag, :title, :value
+  end
 end
