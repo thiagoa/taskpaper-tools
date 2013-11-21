@@ -13,6 +13,20 @@ describe Taskpaper do
       -> { Taskpaper::Line.new('Some text', 'invalid argument') }.should raise_error
     end
 
+    describe ".factory" do
+      it "returns a Project object when the Line matches a project" do
+        Taskpaper::Line.factory('A project:').class.should == Taskpaper::Project
+      end
+
+      it "returns a Task object when the Line matches a task" do
+        Taskpaper::Line.factory('- A task').class.should == Taskpaper::Task
+      end
+
+      it "returns a Comment object when the Line matches a comment" do
+        Taskpaper::Line.factory('A comment').class.should == Taskpaper::Comment
+      end
+    end
+
     describe "#project?" do
       context "with valid project lines" do
         it "asserts valid projects" do
