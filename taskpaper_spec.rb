@@ -96,7 +96,10 @@ describe Taskpaper do
     end
 
     describe "#parse_tags" do
-      subject { parser.parse_tags "One @line with @tag(values) @and(other values)" }
+      subject do
+        parser.line = "One @line with @tag(values) @and(other values)"
+        parser.parse_tags
+      end
 
       its(:length) { should == 3 }
     end

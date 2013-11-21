@@ -32,12 +32,12 @@ module Taskpaper
       line[/\t*/].length
     end
 
-    def parse_tags(line)
-      line.scan(TAG).map { |args| Tag.new(*args.compact) }
+    def parse_tags
+      line.scan(TAG).collect { |args| Tag.new(*args.compact) }
     end
 
     def parse
-      tags = parse_tags(line)
+      tags = parse_tags
       if is_project?
         Project.new line, extract_title(PROJECT), tags
       elsif is_task?
