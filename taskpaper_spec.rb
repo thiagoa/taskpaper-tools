@@ -157,6 +157,45 @@ describe Taskpaper do
   end
 
   describe Taskpaper::Line::Parser do
+    describe ".extract_title" do
+      it "extracts project titles" do
+        titles = [
+          { text: 'A project : @the @tags', expectation: 'A project' },
+          { text: "\t\tA project:",         expectation: 'A project' },
+          { text: "\t\tA @project:",        expectation: 'A @project' },
+        ]
+        titles.each do |title|
+          line = Taskpaper::Line.new(title[:text])
+          Taskpaper::Line::Parser.extract_title(line).should == title[:expectation]
+        end
+      end
+
+      it "extracts task titles" do
+        titles = [
+          { text: '- A task @with @tags',  expectation: 'A task' },
+          { text: "\t\t- A task:",         expectation: 'A task:' },
+          { text: "\t- @the tags @at_end", expectation: '@the tags' },
+        ]
+        titles.each do |title|
+          line = Taskpaper::Line.new(title[:text])
+          Taskpaper::Line::Parser.extract_title(line).should == title[:expectation]
+        end
+      end
+
+      it "extracts comment titles" do
+        titles = [
+          { text: '   A comment',                expectation: 'A comment' },
+          { text: "\t\t\s\sA comment:  ",        expectation: 'A comment:' },
+          { text: "A comment @with @tags",       expectation: 'A comment' },
+          { text: "A comment @tags not @at_end", expectation: 'A comment @tags not' },
+        ]
+        titles.each do |title|
+          line = Taskpaper::Line.new(title[:text])
+          Taskpaper::Line::Parser.extract_title(line).should == title[:expectation]
+        end
+      end
+    end
+
     describe ".parse_tags" do
       subject { Taskpaper::Line::Parser.parse_tags("One @line with @tag(values) @and(other values) @hey") }
 

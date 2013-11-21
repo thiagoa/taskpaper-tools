@@ -1,7 +1,8 @@
 module Taskpaper
   class Line
-    PROJECT = /\A\t*[^-\s](.+):( ((@[^\s]+\s+)+)?@[^\s]+)?\Z/
-    TASK    = /\A\t*-\s(.*)\Z/
+    TAGS_AT_END = '(\s((@[^\s]+\s+)+)?@[^\s]+)?'
+    PROJECT     = /\A\t*(?!-\s)([^\s].*?):#{TAGS_AT_END}\Z/
+    TASK        = /\A\t*-\s(.*?)#{TAGS_AT_END}\Z/
 
     attr_reader :text
 
@@ -30,7 +31,11 @@ module Taskpaper
       TAG = /(@(\S+)\((.*?)\)|@(\S+))/
 
       def self.extract_title(line)
-        line.regex ? line.text[line.regex, 1] : line.text.strip
+        if line.comment?
+          line.text[/\A(\t(?!-\s)|[\t\s])*(.*?)#{TAGS_AT_END}\Z/, 2].strip
+        else
+          line.text[line.regex, 1].strip
+        end
       end
 
       def self.detect_indent(line)
