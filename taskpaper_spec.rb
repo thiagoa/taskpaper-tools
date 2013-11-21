@@ -9,6 +9,10 @@ describe Taskpaper do
   end
 
   describe Taskpaper::Line do
+    it "is instantiated with only one text argument" do
+      -> { Taskpaper::Line.new('Some text', 'invalid argument') }.should raise_error
+    end
+
     describe "#project?" do
       context "with valid project lines" do
         it "asserts valid projects" do
