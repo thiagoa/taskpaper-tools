@@ -96,7 +96,7 @@ describe Taskpaper do
 
       its(:project_count) { should == 2 }
       its(:task_count)    { should == 7 }
-      its(:comment_count) { should == 1 }
+      its(:comment_count) { should == 2 }
     end
   end
 end
