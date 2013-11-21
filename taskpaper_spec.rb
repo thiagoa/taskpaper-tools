@@ -157,7 +157,7 @@ describe Taskpaper do
   end
 
   describe Taskpaper::Line::Parser do
-    describe "#parse_tags" do
+    describe ".parse_tags" do
       subject { Taskpaper::Line::Parser.parse_tags("One @line with @tag(values) @and(other values) @hey") }
 
       its(:length) { should == 4 }
