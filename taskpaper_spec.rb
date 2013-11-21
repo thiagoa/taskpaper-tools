@@ -124,6 +124,16 @@ describe Taskpaper do
         end
       end
     end
+
+    describe "#regex" do
+      it "returns the PROJECT regex for a project line" do
+        Taskpaper::Line.new("A project:").regex.should == Taskpaper::Line::PROJECT
+      end
+
+      it "returns the TASK regex for a task line" do
+        Taskpaper::Line.new("- A task").regex.should == Taskpaper::Line::TASK
+      end
+    end
   end
 
   describe Taskpaper::Line::Parser do
