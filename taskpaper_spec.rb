@@ -22,7 +22,9 @@ describe Taskpaper do
             "\tPaper Drawings:",
             "Weird Project: @tag1  @tag2 @tag3"
           ]
-          lines.each { |line| Taskpaper::Line.new(line).should be_project }
+          lines.each do |line|
+            Taskpaper::Line.new(line).should be_project, line
+          end
         end
       end
 
@@ -40,7 +42,9 @@ describe Taskpaper do
             "Comment line",
             "New line project:\n\n"
           ]
-          lines.each { |line| Taskpaper::Line.new(line).should_not be_project }
+          lines.each do |line|
+            Taskpaper::Line.new(line).should_not be_project, line
+          end
         end
       end
     end
@@ -58,7 +62,9 @@ describe Taskpaper do
             "\t- @many Paper Drawings @everyday",
             "- Weird task: @tag1  @tag2 @tag3"
           ]
-          lines.each { |line| Taskpaper::Line.new(line).should be_task }
+          lines.each do |line|
+            Taskpaper::Line.new(line).should be_task, line
+          end
         end
       end
 
@@ -76,7 +82,9 @@ describe Taskpaper do
             "Comment line",
             "New line task:\n\n"
           ]
-          lines.each { |line| Taskpaper::Line.new(line).should_not be_task }
+          lines.each do |line|
+            Taskpaper::Line.new(line).should_not be_task, line
+          end
         end
       end
     end
