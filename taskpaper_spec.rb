@@ -9,21 +9,23 @@ describe Taskpaper do
   end
 
   describe Taskpaper::Line do
+    subject { Taskpaper::Line }
+
     it "is instantiated with only one text argument" do
-      -> { Taskpaper::Line.new('Some text', 'invalid argument') }.should raise_error
+      -> { subject.new('Some text', 'invalid argument') }.should raise_error
     end
 
     describe ".factory" do
       it "returns a Project object when the Line matches a project" do
-        Taskpaper::Line.factory('A project:').class.should == Taskpaper::Project
+        subject.factory('A project:').class.should == Taskpaper::Project
       end
 
       it "returns a Task object when the Line matches a task" do
-        Taskpaper::Line.factory('- A task').class.should == Taskpaper::Task
+        subject.factory('- A task').class.should == Taskpaper::Task
       end
 
       it "returns a Comment object when the Line matches a comment" do
-        Taskpaper::Line.factory('A comment').class.should == Taskpaper::Comment
+        subject.factory('A comment').class.should == Taskpaper::Comment
       end
     end
 
@@ -41,7 +43,7 @@ describe Taskpaper do
             "Weird Project: @tag1  @tag2 @tag3"
           ]
           lines.each do |line|
-            Taskpaper::Line.new(line).should be_project, line
+            subject.new(line).should be_project, line
           end
         end
       end
@@ -61,7 +63,7 @@ describe Taskpaper do
             "New line project:\n\n"
           ]
           lines.each do |line|
-            Taskpaper::Line.new(line).should_not be_project, line
+            subject.new(line).should_not be_project, line
           end
         end
       end
@@ -81,7 +83,7 @@ describe Taskpaper do
             "- Weird task: @tag1  @tag2 @tag3"
           ]
           lines.each do |line|
-            Taskpaper::Line.new(line).should be_task, line
+            subject.new(line).should be_task, line
           end
         end
       end
@@ -101,7 +103,7 @@ describe Taskpaper do
             "New line task:\n\n"
           ]
           lines.each do |line|
-            Taskpaper::Line.new(line).should_not be_task, line
+            subject.new(line).should_not be_task, line
           end
         end
       end
@@ -122,7 +124,7 @@ describe Taskpaper do
             " Number nine, number nine, number nine, @number @nine @number(nine)"
           ]
           lines.each do |line|
-            Taskpaper::Line.new(line).should be_comment, line
+            subject.new(line).should be_comment, line
           end
         end
       end
@@ -137,7 +139,7 @@ describe Taskpaper do
             "\t\tThis is a project, not a comment:",
           ]
           lines.each do |line|
-            Taskpaper::Line.new(line).should_not be_comment, line
+            subject.new(line).should_not be_comment, line
           end
         end
       end
@@ -145,11 +147,11 @@ describe Taskpaper do
 
     describe "#regex" do
       it "returns the PROJECT regex for a project line" do
-        Taskpaper::Line.new("A project:").regex.should == Taskpaper::Line::PROJECT
+        subject.new("A project:").regex.should == Taskpaper::Line::PROJECT
       end
 
       it "returns the TASK regex for a task line" do
-        Taskpaper::Line.new("- A task").regex.should == Taskpaper::Line::TASK
+        subject.new("- A task").regex.should == Taskpaper::Line::TASK
       end
     end
   end
