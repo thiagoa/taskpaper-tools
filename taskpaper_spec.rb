@@ -215,6 +215,20 @@ describe Taskpaper do
 
       its(:length) { should == 4 }
     end
+
+    describe ".parse" do
+      it "extracts the line components" do
+        line     = Taskpaper::Line.new("\t\tA title here @with @tags")
+        contents = Taskpaper::Line::Parser.parse(line)
+
+        contents.should include(
+          text:   line.text,
+          title:  Taskpaper::Line::Parser.extract_title(line),
+          tags:   Taskpaper::Line::Parser.parse_tags(line.text),
+          indent: Taskpaper::Line::Parser.detect_indent(line),
+        )
+      end
+    end
   end
 
   describe Taskpaper::DataFile do
