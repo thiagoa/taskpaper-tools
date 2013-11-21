@@ -8,10 +8,8 @@ describe Taskpaper do
     end
   end
 
-  describe Taskpaper::LineParser do
-    let(:parser) { Taskpaper::LineParser.new }
-
-    describe "#is_project?" do
+  describe Taskpaper::Line do
+    describe "#project?" do
       context "with valid project lines" do
         it "asserts valid projects" do
           lines = [
@@ -24,10 +22,7 @@ describe Taskpaper do
             "\tPaper Drawings:",
             "Weird Project: @tag1  @tag2 @tag3"
           ]
-          lines.each do |line|
-            parser.line = line
-            parser.is_project?.should be_true
-          end
+          lines.each { |line| Taskpaper::Line.new(line).should be_project }
         end
       end
 
@@ -45,15 +40,12 @@ describe Taskpaper do
             "Comment line",
             "New line project:\n\n"
           ]
-          lines.each do |line|
-            parser.line = line
-            parser.is_project?.should be_false
-          end
+          lines.each { |line| Taskpaper::Line.new(line).should_not be_project }
         end
       end
     end
 
-    describe "#is_task" do
+    describe "#task?" do
       context "with valid task lines" do
         it "asserts valid tasks" do
           lines = [
@@ -66,10 +58,7 @@ describe Taskpaper do
             "\t- @many Paper Drawings @everyday",
             "- Weird task: @tag1  @tag2 @tag3"
           ]
-          lines.each do |line|
-            parser.line = line
-            parser.is_task?.should be_true, "#{line} should be a task"
-          end
+          lines.each { |line| Taskpaper::Line.new(line).should be_task }
         end
       end
 
@@ -87,21 +76,17 @@ describe Taskpaper do
             "Comment line",
             "New line task:\n\n"
           ]
-          lines.each do |line|
-            parser.line = line
-            parser.is_task?.should be_false
-          end
+          lines.each { |line| Taskpaper::Line.new(line).should_not be_task }
         end
       end
     end
+  end
 
+  describe Taskpaper::Line::Parser do
     describe "#parse_tags" do
-      subject do
-        parser.line = "One @line with @tag(values) @and(other values)"
-        parser.parse_tags
-      end
+      subject { Taskpaper::Line::Parser.parse_tags("One @line with @tag(values) @and(other values) @hey") }
 
-      its(:length) { should == 3 }
+      its(:length) { should == 4 }
     end
   end
 
@@ -109,7 +94,9 @@ describe Taskpaper do
     context "when an object is created" do
       subject { Taskpaper.open('example.taskpaper') }
 
-      its(:projects) { should == 2 }
+      its(:project_count) { should == 2 }
+      its(:task_count)    { should == 7 }
+      its(:comment_count) { should == 1 }
     end
   end
 end

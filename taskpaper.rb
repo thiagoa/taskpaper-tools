@@ -1,78 +1,122 @@
 module Taskpaper
-
-  def self.open(path)
-    contents = File.read path
-    DataFile.new contents, LineParser.new
-  end
-
-  class LineParser
+  class Line
     PROJECT = /\A\t*[^-\s](.+):( ((@[^\s]+\s+)+)?@[^\s]+)?\Z/
     TASK    = /\A\t*-\s(.*)\Z/
-    TAG     = /(@(\S+)\((.*?)\)|@(\S+))/
 
-    attr_accessor :line
+    attr_reader :text
 
-    def is_project?
-      !!(line =~ PROJECT)
+    def initialize(text)
+      @text = text
     end
 
-    def is_task?
-      !!(line =~ TASK)
+    def project?
+      !!(text =~ PROJECT)
     end
 
-    def is_comment?
-      !is_project? && !is_task?
+    def task?
+      !!(text =~ TASK)
     end
 
-    def extract_title(type)
-      line[type, 1]
+    def comment?
+      !project? && !task?
     end
 
-    def detect_indent
-      line[/\t*/].length
+    def regex
+      return PROJECT if project?
+      return TASK    if task?
     end
 
-    def parse_tags
-      line.scan(TAG).collect { |args| Tag.new(*args.compact) }
-    end
+    module Parser
+      TAG = /(@(\S+)\((.*?)\)|@(\S+))/
 
-    def parse
-      tags = parse_tags
-      if is_project?
-        Project.new line, extract_title(PROJECT), tags
-      elsif is_task?
-        Task.new line, extract_title(TASK), tags
-      else
-        Comment.new line, line.strip, tags
+      def self.extract_title(line)
+        line.regex ? line.text[line.regex, 1] : line.text.strip
+      end
+
+      def self.detect_indent(line)
+        line.text[/\t*/].length
+      end
+
+      def self.parse_tags(text)
+        text.scan(TAG).collect { |args| Tag.new(*args.compact) }
+      end
+
+      def self.parse(line)
+        { 
+          text:   line.text, 
+          title:  extract_title(line), 
+          tags:   parse_tags(line.text), 
+          indent: detect_indent(line) 
+        }
       end
     end
+  end
+
+  def Line.factory(text)
+    line = new(text)
+    args = Line::Parser.parse(line)
+
+    return Project.new args if line.project?
+    return Task.new args    if line.task?
+    return Comment.new args
+  end
+
+  class ParsedLine
+    attr_reader :text, :title, :indent, :tags
+
+    def initialize(args)
+      args.each do |arg, val|
+        instance_variable_set("@#{arg}", val)
+      end
+    end
+
+    def type
+      self.class
+    end
+
+    def to_s
+      text
+    end
+  end
+
+  class Project < ParsedLine; end
+  class Task    < ParsedLine; end
+  class Comment < ParsedLine; end
+
+  Tag = Struct.new(:tag, :title, :value) do
+    attr_reader :tag, :title, :value
   end
 
   class DataFile
     include Enumerable
     attr_reader :lines
 
-    def initialize(contents, parser)
-      @lines = contents.split(/\n/).map do |line| 
-        parser.line = line
-        parser.parse
-      end
+    def initialize(contents)
+      @lines = contents.split(/\n/).map { |line| Line.factory(line) }
     end
 
-    def projects
-      count 'project'
+    def project_count
+      count Project
     end
 
-    def tasks
-      count 'task'
+    def task_count
+      count Task
     end
 
-    def comments
-      count 'comment'
+    def comment_count
+      count Comment
+    end
+
+    def line(number)
+      lines[number - 1]
     end
 
     def each(&block)
       lines.each { |line| block.call line }
+    end
+
+    def to_s
+      lines.join("\n")
     end
 
     private
@@ -83,20 +127,9 @@ module Taskpaper
         end
       end
   end
-
-  Line = Struct.new(:text, :title, :tags, :children) do
-    attr_reader :text, :title, :tags, :children
-
-    def type
-      self.class.to_s.split('::').pop.downcase
-    end
-  end
-
-  class Project < Line; end
-  class Task    < Line; end
-  class Comment < Line; end
-
-  Tag = Struct.new(:tag, :title, :value) do
-    attr_reader :tag, :title, :value
+  
+  def self.open(path)
+    contents = File.read path
+    DataFile.new contents
   end
 end
