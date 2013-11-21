@@ -1,6 +1,6 @@
 module Taskpaper
 
-  def self.factory(path)
+  def self.open(path)
     contents = File.read path
     DataFile.new contents, LineParser.new
   end

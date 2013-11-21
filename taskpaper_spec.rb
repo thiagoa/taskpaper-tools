@@ -3,7 +3,7 @@ require_relative 'taskpaper.rb'
 describe Taskpaper do
   context "when reading a text file" do
     it "returns a DataFile object" do
-      file = Taskpaper.factory('example.taskpaper')
+      file = Taskpaper.open('example.taskpaper')
       file.should be_kind_of Taskpaper::DataFile
     end
   end
@@ -104,7 +104,7 @@ describe Taskpaper do
 
   describe Taskpaper::DataFile do
     context "when an object is created" do
-      subject { Taskpaper.factory('example.taskpaper') }
+      subject { Taskpaper.open('example.taskpaper') }
 
       its(:projects) { should == 2 }
     end
