@@ -26,7 +26,7 @@ describe Taskpaper do
           ]
           lines.each do |line|
             parser.line = line
-            parser.is_project?.should_not be_nil
+            parser.is_project?.should be_true
           end
         end
       end
@@ -47,7 +47,7 @@ describe Taskpaper do
           ]
           lines.each do |line|
             parser.line = line
-            parser.is_project?.should be_nil
+            parser.is_project?.should be_false
           end
         end
       end
@@ -68,7 +68,7 @@ describe Taskpaper do
           ]
           lines.each do |line|
             parser.line = line
-            parser.is_task?.should_not be_nil, "#{line} should be a task"
+            parser.is_task?.should be_true, "#{line} should be a task"
           end
         end
       end
@@ -89,7 +89,7 @@ describe Taskpaper do
           ]
           lines.each do |line|
             parser.line = line
-            parser.is_task?.should be_nil
+            parser.is_task?.should be_false
           end
         end
       end

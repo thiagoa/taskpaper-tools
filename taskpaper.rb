@@ -13,11 +13,11 @@ module Taskpaper
     attr_accessor :line
 
     def is_project?
-      line =~ PROJECT
+      !!(line =~ PROJECT)
     end
 
     def is_task?
-      line =~ TASK
+      !!(line =~ TASK)
     end
 
     def is_comment?
