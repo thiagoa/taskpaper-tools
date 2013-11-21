@@ -1,5 +1,6 @@
-Home todos:
+Home todos: @important
 	- @first thing today: read @email
+	- A task:
 	- Buy bread and milk
 	- Clean the bathroom @nasty
 	- Find a new receipt to cook for the dinner @cooking(receipts)

@@ -208,7 +208,7 @@ describe Taskpaper do
       subject { Taskpaper.open('example.taskpaper') }
 
       its(:project_count) { should == 2 }
-      its(:task_count)    { should == 7 }
+      its(:task_count)    { should == 8 }
       its(:comment_count) { should == 2 }
     end
   end
