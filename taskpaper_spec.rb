@@ -196,6 +196,20 @@ describe Taskpaper do
       end
     end
 
+    describe ".detect_indent" do
+      it "detects the indent" do
+        titles = [
+          { text: 'No indent here',  expectation: 0 },
+          { text: "\tOne indent",    expectation: 1 },
+          { text: "\t\tTwo indents", expectation: 2 }
+        ]
+        titles.each do |title|
+          line = Taskpaper::Line.new(title[:text])
+          Taskpaper::Line::Parser.detect_indent(line).should == title[:expectation]
+        end
+      end
+    end
+
     describe ".parse_tags" do
       subject { Taskpaper::Line::Parser.parse_tags("One @line with @tag(values) @and(other values) @hey") }
 
