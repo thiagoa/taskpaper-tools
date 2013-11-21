@@ -232,12 +232,24 @@ describe Taskpaper do
   end
 
   describe Taskpaper::DataFile do
-    context "when an object is created" do
-      subject { Taskpaper.open('example.taskpaper') }
+    subject { Taskpaper::DataFile.new(File.read('example.taskpaper')) }
 
+    context "projects, tasks and comments count" do
       its(:project_count) { should == 2 }
       its(:task_count)    { should == 8 }
       its(:comment_count) { should == 2 }
+    end
+
+    describe ".line" do
+      it "returns the right line" do
+        subject.line(2).text.should == "\t- @first thing today: read @email"
+      end
+    end
+
+    describe ".to_s" do
+      it "outputs the entire file" do
+        "#{subject.to_s}\n".should == File.read('example.taskpaper')
+      end
     end
   end
 end
