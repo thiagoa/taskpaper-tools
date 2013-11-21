@@ -88,6 +88,42 @@ describe Taskpaper do
         end
       end
     end
+
+    describe "#comment?" do
+      context "with valid comment lines" do
+        it "asserts valid comments" do
+          lines = [
+            "Like a fine wine, really",
+            "\tI've got blisters on my fingers!",
+            "\t And in the end, the love you take, is equal to the love you make",
+            "\t\tAre you a mod or a rocker?",
+            "      Never could be any other way   ",
+            "      Yesterday, all my troubles seemed so far @away",
+            " - I'm a mocker:",
+            "Here today: ",
+            " Number nine, number nine, number nine, @number @nine @number(nine)"
+          ]
+          lines.each do |line|
+            Taskpaper::Line.new(line).should be_comment, line
+          end
+        end
+      end
+
+      context "with invalid comment lines" do
+        it "asserts invalid comments" do
+          lines = [
+            "- This is a task, not a comment",
+            "\t- This is a task, not a comment",
+            "This is a project, not a comment:",
+            "\tThis is a project, not a comment:",
+            "\t\tThis is a project, not a comment:",
+          ]
+          lines.each do |line|
+            Taskpaper::Line.new(line).should_not be_comment, line
+          end
+        end
+      end
+    end
   end
 
   describe Taskpaper::Line::Parser do
