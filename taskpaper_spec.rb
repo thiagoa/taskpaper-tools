@@ -136,6 +136,8 @@ describe Taskpaper do
   end
 
   describe Taskpaper::Line::Parser do
+    subject { Taskpaper::Line::Parser }
+
     describe ".extract_title" do
       it "extracts project titles" do
         titles = [
@@ -145,7 +147,7 @@ describe Taskpaper do
         ]
         titles.each do |title|
           line = Taskpaper::Line.new(title[:text])
-          Taskpaper::Line::Parser.extract_title(line).should == title[:expectation]
+          subject.extract_title(line).should == title[:expectation]
         end
       end
 
@@ -157,7 +159,7 @@ describe Taskpaper do
         ]
         titles.each do |title|
           line = Taskpaper::Line.new(title[:text])
-          Taskpaper::Line::Parser.extract_title(line).should == title[:expectation]
+          subject.extract_title(line).should == title[:expectation]
         end
       end
 
@@ -170,7 +172,7 @@ describe Taskpaper do
         ]
         titles.each do |title|
           line = Taskpaper::Line.new(title[:text])
-          Taskpaper::Line::Parser.extract_title(line).should == title[:expectation]
+          subject.extract_title(line).should == title[:expectation]
         end
       end
     end
@@ -184,7 +186,7 @@ describe Taskpaper do
         ]
         titles.each do |title|
           line = Taskpaper::Line.new(title[:text])
-          Taskpaper::Line::Parser.detect_indent(line).should == title[:expectation]
+          subject.detect_indent(line).should == title[:expectation]
         end
       end
     end
