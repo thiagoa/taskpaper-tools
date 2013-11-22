@@ -199,14 +199,18 @@ describe Taskpaper do
 
     describe ".parse" do
       it "extracts the line components" do
-        line     = Taskpaper::Line.new("\t\tA title here @with @tags")
-        contents = Taskpaper::Line::Parser.parse(line)
+        line = double('line')
 
-        contents.should include(
-          text:   line.text,
-          title:  Taskpaper::Line::Parser.extract_title(line),
-          tags:   Taskpaper::Line::Parser.parse_tags(line.text),
-          indent: Taskpaper::Line::Parser.detect_indent(line),
+        line.stub(:text).and_return('A line')
+        subject.should receive(:extract_title).with(line).and_return('Extract title')
+        subject.should receive(:parse_tags).with(line.text).and_return('Parse tags')
+        subject.should receive(:detect_indent).with(line).and_return('Detect indent')
+
+        subject.parse(line).should include(
+          text:   'A line',
+          title:  'Extract title',
+          tags:   'Parse tags',
+          indent: 'Detect indent',
         )
       end
     end
