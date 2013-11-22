@@ -121,7 +121,7 @@ module Taskpaper
     end
 
     def to_s
-      lines.join("\n")
+      "#{lines.join("\n").chomp}\n"
     end
 
     private

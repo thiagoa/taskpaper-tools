@@ -233,7 +233,7 @@ describe Taskpaper do
 
     describe ".to_s" do
       it "outputs the entire file" do
-        "#{subject.to_s}\n".should == File.read('example.taskpaper')
+        subject.to_s.should == File.read('example.taskpaper')
       end
     end
   end
