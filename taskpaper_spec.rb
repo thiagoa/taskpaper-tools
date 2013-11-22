@@ -19,16 +19,22 @@ describe Taskpaper do
     end
 
     describe ".factory" do
-      it "returns a Project" do
-        subject.factory('A project:').class.should == Taskpaper::Project
+      context "with a project line" do
+        it "returns a Project" do
+          subject.factory('A project:').class.should == Taskpaper::Project
+        end
       end
 
-      it "returns a Task" do
-        subject.factory('- A task').class.should == Taskpaper::Task
+      context "with a task line" do
+        it "returns a Task" do
+          subject.factory('- A task').class.should == Taskpaper::Task
+        end
       end
 
-      it "returns a Comment" do
-        subject.factory('A comment').class.should == Taskpaper::Comment
+      context "with a comment line" do
+        it "returns a Comment" do
+          subject.factory('A comment').class.should == Taskpaper::Comment
+        end
       end
     end
 
