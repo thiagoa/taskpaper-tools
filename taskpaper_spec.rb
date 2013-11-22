@@ -1,156 +1,135 @@
 require_relative 'taskpaper.rb'
 
 describe Taskpaper do
-  context "when reading a text file" do
-    it "returns a DataFile object" do
-      file = Taskpaper.open('example.taskpaper')
-      file.should be_kind_of Taskpaper::DataFile
-    end
+  context "when opening a taskpaper file" do
+    subject { Taskpaper.open('example.taskpaper') }
+    
+    it { should be_kind_of Taskpaper::DataFile }
+
+    its(:project_count) { should == 2 }
+    its(:task_count)    { should == 8 }
+    its(:comment_count) { should == 2 }
   end
 
   describe Taskpaper::Line do
     subject { Taskpaper::Line }
 
-    it "is instantiated with only one text argument" do
+    it "accepts one text argument" do
       -> { subject.new('Some text', 'invalid argument') }.should raise_error
     end
 
     describe ".factory" do
-      it "returns a Project object when the Line matches a project" do
+      it "returns a Project" do
         subject.factory('A project:').class.should == Taskpaper::Project
       end
 
-      it "returns a Task object when the Line matches a task" do
+      it "returns a Task" do
         subject.factory('- A task').class.should == Taskpaper::Task
       end
 
-      it "returns a Comment object when the Line matches a comment" do
+      it "returns a Comment" do
         subject.factory('A comment').class.should == Taskpaper::Comment
       end
     end
 
     describe "#project?" do
-      context "with valid project lines" do
-        it "asserts valid projects" do
-          lines = [
-            "Home tasks:",
-            "\tCleaning:",
-            "\t\tOther:",
-            "Room organization: @weekly",
-            "Drawings:",
-            "\tPaintings: @daily @art",
-            "\tPaper Drawings:",
-            "Weird Project: @tag1  @tag2 @tag3"
-          ]
-          lines.each do |line|
-            subject.new(line).should be_project, line
-          end
-        end
+      it "is a project" do
+        lines = [
+          "Home tasks:",
+          "\tCleaning:",
+          "\t\tOther:",
+          "Room organization: @weekly",
+          "Drawings:",
+          "\tPaintings: @daily @art",
+          "\tPaper Drawings:",
+          "Weird Project: @tag1  @tag2 @tag3"
+        ]
+        lines.each { |line| subject.new(line).should be_project, line }
       end
 
-      context "with invalid project lines" do
-        it "doesn't assert invalid projects" do
-          lines = [
-            "Home tasks: ",
-            "\t Cleaning:",
-            "\t\tOther: ",
-            "Room organization: @weekly mess",
-            "- Drawings:",
-            "\tPaintings: @daily ",
-            "\tPaper Drawings: @one two @three",
-            "\tAnother: @one @two @three ",
-            "Comment line",
-            "New line project:\n\n"
-          ]
-          lines.each do |line|
-            subject.new(line).should_not be_project, line
-          end
-        end
+      it "is not a project" do
+        lines = [
+          "Home tasks: ",
+          "\t Cleaning:",
+          "\t\tOther: ",
+          "Room organization: @weekly mess",
+          "- Drawings:",
+          "\tPaintings: @daily ",
+          "\tPaper Drawings: @one two @three",
+          "\tAnother: @one @two @three ",
+          "Comment line",
+          "New line project:\n\n"
+        ]
+        lines.each { |line| subject.new(line).should_not be_project, line }
       end
     end
 
     describe "#task?" do
-      context "with valid task lines" do
-        it "asserts valid tasks" do
-          lines = [
-            "- Home tasks",
-            "\t- Cleaning:",
-            "\t\t- Other",
-            "- Room organization @weekly",
-            "\t\t\t- Drawings @daily everyday",
-            "\t- Paintings: @daily @art",
-            "\t- @many Paper Drawings @everyday",
-            "- Weird task: @tag1  @tag2 @tag3"
-          ]
-          lines.each do |line|
-            subject.new(line).should be_task, line
-          end
-        end
+      it "is a task" do
+        lines = [
+          "- Home tasks",
+          "\t- Cleaning:",
+          "\t\t- Other",
+          "- Room organization @weekly",
+          "\t\t\t- Drawings @daily everyday",
+          "\t- Paintings: @daily @art",
+          "\t- @many Paper Drawings @everyday",
+          "- Weird task: @tag1  @tag2 @tag3"
+        ]
+        lines.each { |line| subject.new(line).should be_task, line }
       end
 
-      context "with invalid task lines" do
-        it "doesn't assert invalid tasks" do
-          lines = [
-            "Home tasks: ",
-            "\t Cleaning:",
-            "\t\tOther: ",
-            "Room organization: @weekly mess",
-            "-Drawings:",
-            "\tPaintings: @daily ",
-            "\tPaper Drawings: @one two @three",
-            "\tAnother: @one @two @three ",
-            "Comment line",
-            "New line task:\n\n"
-          ]
-          lines.each do |line|
-            subject.new(line).should_not be_task, line
-          end
-        end
+      it "is not a task" do
+        lines = [
+          "Home tasks: ",
+          "\t Cleaning:",
+          "\t\tOther: ",
+          "Room organization: @weekly mess",
+          "-Drawings:",
+          "\tPaintings: @daily ",
+          "\tPaper Drawings: @one two @three",
+          "\tAnother: @one @two @three ",
+          "Comment line",
+          "New line task:\n\n"
+        ]
+        lines.each { |line| subject.new(line).should_not be_task, line }
       end
     end
 
     describe "#comment?" do
-      context "with valid comment lines" do
-        it "asserts valid comments" do
-          lines = [
-            "Like a fine wine, really",
-            "\tI've got blisters on my fingers!",
-            "\t And in the end, the love you take, is equal to the love you make",
-            "\t\tAre you a mod or a rocker?",
-            "      Never could be any other way   ",
-            "      Yesterday, all my troubles seemed so far @away",
-            " - I'm a mocker:",
-            "Here today: ",
-            " Number nine, number nine, number nine, @number @nine @number(nine)"
-          ]
-          lines.each do |line|
-            subject.new(line).should be_comment, line
-          end
-        end
+      it "is a comment" do
+        lines = [
+          "Like a fine wine, really",
+          "\tI've got blisters on my fingers!",
+          "\t And in the end, the love you take, is equal to the love you make",
+          "\t\tAre you a mod or a rocker?",
+          "      Never could be any other way   ",
+          "      Yesterday, all my troubles seemed so far @away",
+          " - I'm a mocker:",
+          "Here today: ",
+          " Number nine, number nine, number nine, @number @nine @number(nine)"
+        ]
+        lines.each { |line| subject.new(line).should be_comment, line }
       end
 
-      context "with invalid comment lines" do
-        it "asserts invalid comments" do
-          lines = [
-            "- This is a task, not a comment",
-            "\t- This is a task, not a comment",
-            "This is a project, not a comment:",
-            "\tThis is a project, not a comment:",
-            "\t\tThis is a project, not a comment:",
-          ]
-          lines.each do |line|
-            subject.new(line).should_not be_comment, line
-          end
-        end
+      it "is not a comment" do
+        lines = [
+          "- This is a task, not a comment",
+          "\t- This is a task, not a comment",
+          "This is a project, not a comment:",
+          "\tThis is a project, not a comment:",
+          "\t\tThis is a project, not a comment:",
+        ]
+        lines.each { |line| subject.new(line).should_not be_comment, line }
       end
     end
 
     describe "#regex" do
-      it "returns the PROJECT regex for a project line" do
+      it "returns PROJECT" do
         subject.new("A project:").regex.should == Taskpaper::Line::PROJECT
       end
 
-      it "returns the TASK regex for a task line" do
+      it "returns TASK" do
         subject.new("- A task").regex.should == Taskpaper::Line::TASK
       end
     end
@@ -232,17 +211,11 @@ describe Taskpaper do
   end
 
   describe Taskpaper::DataFile do
-    subject { Taskpaper::DataFile.new(File.read('example.taskpaper')) }
-
-    context "projects, tasks and comments count" do
-      its(:project_count) { should == 2 }
-      its(:task_count)    { should == 8 }
-      its(:comment_count) { should == 2 }
-    end
+    subject(:file) { Taskpaper::DataFile.new(File.read('example.taskpaper')) }
 
     describe ".line" do
       it "returns the right line" do
-        subject.line(2).text.should == "\t- @first thing today: read @email"
+        file.line(2).text.should == "\t- @first thing today: read @email"
       end
     end
 
