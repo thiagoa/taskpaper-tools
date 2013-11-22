@@ -39,7 +39,7 @@ describe Taskpaper do
     end
 
     describe "#project?" do
-      it "is a project" do
+      it "asserts projects" do
         lines = [
           "Home tasks:",
           "\tCleaning:",
@@ -53,7 +53,7 @@ describe Taskpaper do
         lines.each { |line| subject.new(line).should be_project, line }
       end
 
-      it "is not a project" do
+      it "does not assert projects" do
         lines = [
           "Home tasks: ",
           "\t Cleaning:",
@@ -71,7 +71,7 @@ describe Taskpaper do
     end
 
     describe "#task?" do
-      it "is a task" do
+      it "asserts tasks" do
         lines = [
           "- Home tasks",
           "\t- Cleaning:",
@@ -85,7 +85,7 @@ describe Taskpaper do
         lines.each { |line| subject.new(line).should be_task, line }
       end
 
-      it "is not a task" do
+      it "does not assert tasks" do
         lines = [
           "Home tasks: ",
           "\t Cleaning:",
@@ -103,7 +103,7 @@ describe Taskpaper do
     end
 
     describe "#comment?" do
-      it "is a comment" do
+      it "asserts comments" do
         lines = [
           "Like a fine wine, really",
           "\tI've got blisters on my fingers!",
@@ -118,7 +118,7 @@ describe Taskpaper do
         lines.each { |line| subject.new(line).should be_comment, line }
       end
 
-      it "is not a comment" do
+      it "does not assert comments" do
         lines = [
           "- This is a task, not a comment",
           "\t- This is a task, not a comment",
